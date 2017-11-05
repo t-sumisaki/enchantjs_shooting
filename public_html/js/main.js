@@ -73,14 +73,12 @@
             console.log('[debug] initialize TitleScene...')
             Scene.call(this);
 
-
-            let label = new Label('Title');
-
+            let label = new Label('PRESS SPACEBAR TO START');
+            label.width = 300;
+            label.textAlign = 'center';
+            label.moveTo(_game.width / 2 - label.width / 2, _game.height - 40);
             this.addChild(label);
 
-            this.addEventListener('enterframe', function() {
-
-            });
             this.addEventListener('enterbuttondown', function () {
                 let connectScene = new ConnectScene(_game);
                 _game.replaceScene(connectScene);
@@ -105,7 +103,7 @@
                 }
             })
         }
-    })
+    });
 
     const GameScene = Class.create(Scene, {
         initialize: function (_game) {
@@ -118,13 +116,17 @@
             this.addChild(player);
             _game.addPlayer(player);
 
+            let playerLifebar = new LifeBar(player, 40, 4);
+            player.addChild(playerLifebar)
+
 
             let monster = new Monster(_game);
             this.addChild(monster);
             _game.addMonster(monster);
 
-            let lifebar = new LifeBar(monster, 10, 10);
-            this.addChild(lifebar)
+            let monsterLifebar = new LifeBar(monster, 600, 20);
+            monsterLifebar.moveTo(10, 10);
+            this.addChild(monsterLifebar)
 
 
 
@@ -152,7 +154,10 @@
             Scene.call(this);
 
 
-            let label = new Label('Result');
+            let label = new Label('PRESS Q TO CONTINUE');
+            label.width = 300;
+            label.textAlign = 'center';
+            label.moveTo(_game.width / 2 - label.width / 2, _game.height - 40);
             this.addChild(label);
 
 
@@ -280,6 +285,7 @@
             this.x = 100;
             this.y = 100;
             this.hp = 3;
+            this.defaulthp = 3;
             this.speed = 6;
             this.recast = {
                 normal: { max: 2, current: 0 }
@@ -533,20 +539,27 @@
     });
 
 
-    const LifeBar = Class.create(Entity, {
-        initialize: function(_target, x, y) {
-            Entity.call(this);
-            this.width = 500;
-            this.height = 30;
-            this.backgroundColor = 'blue';
-            this.x = x;
-            this.y = y;
+    const LifeBar = Class.create(Group, {
+        initialize: function(_target, _width = 600, _height = 20) {
+            Group.call(this);
 
-            this.defaultWidth = 500;
+            this.width = _width;
+            this.height = _height;
+            
+            let baseBar = new Entity();
+            baseBar.width = this.width;
+            baseBar.height = this.height;
+            baseBar.backgroundColor = 'gray';
+            this.addChild(baseBar);
+
+            let currentBar = new Entity();
+            currentBar.width = this.width;
+            currentBar.height = this.height;
+            currentBar.backgroundColor = 'blue';
+            this.addChild(currentBar);
 
             this.addEventListener('enterframe', function() {
-                this.width = this.defaultWidth * (_target.hp / _target.defaulthp);
-                console.log(this.width);
+                currentBar.width = this.width * (_target.hp / _target.defaulthp);
             })
         }
     });
